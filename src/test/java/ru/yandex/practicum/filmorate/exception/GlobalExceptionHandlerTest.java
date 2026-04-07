@@ -36,14 +36,12 @@ class GlobalExceptionHandlerTest {
     @Test
     void testHandleValidationException() throws Exception {
         // Given: некорректные данные пользователя (пустое имя)
-        String invalidUserJson = """
-            {
-                "email": "invalid-email",
-                "login": "test",
-                "name": "",
-                "birthday": "2020-01-01"
-            }
-            """;
+        String invalidUserJson = "{\n" +
+                "  \"email\": \"invalid-email\",\n" +
+                "  \"login\": \"test\",\n" +
+                "  \"name\": \"\",\n" +
+                "  \"birthday\": \"2020-01-01\"\n" +
+                "}";
 
         // When: пытаемся создать пользователя с некорректными данными
         mockMvc.perform(post("/users")
@@ -104,14 +102,12 @@ class GlobalExceptionHandlerTest {
     @Test
     void testHandleConstraintViolationException() throws Exception {
         // Given: данные фильма с некорректной датой (в будущем)
-        String invalidFilmJson = """
-            {
-                "name": "Future Film",
-                "description": "A film from the future",
-                "releaseDate": "3000-01-01",
-                "duration": 120
-            }
-            """;
+        String invalidFilmJson = "{\n" +
+                "  \"name\": \"Future Film\",\n" +
+                "  \"description\": \"A film from the future\",\n" +
+                "  \"releaseDate\": \"3000-01-01\",\n" +
+                "  \"duration\": 120\n" +
+                "}";
 
         // When: пытаемся создать фильм с некорректной датой
         mockMvc.perform(post("/films")
