@@ -6,10 +6,59 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Map<Long, User> users = new ConcurrentHashMap<>();
+    private long nextId = 1L;
+
+    public User createUser(User user) {
+        validateUser(user);
+        user.setId(nextId++);
+        users.put(user.getId(), user);
+        log.info("User created with ID: {}", user.getId());
+        return user;
+    }
+
+    public User updateUser(User user) {
+        Long userId = user.getId();
+        if (userId == null || !users.containsKey(userId)) {
+            log.warn("Attempt to update non-existent user with ID: {}", userId);
+            throw new IllegalArgumentException("Пользователь с ID " + userId + " не найден");
+        }
+        validateUser(user);
+        users.put(userId, user);
+        log.info("User updated with ID: {}", userId);
+        return user;
+    }
+
+    public List<User> getAllUsers() {
+        List<User> userList = new ArrayList<>(users.values());
+        log.info("Retrieved all users, count: {}", userList.size());
+        return userList;
+    }
+
+    public User getUserById(Long id) {
+        User user = users.get(id);
+        if (user == null) {
+            log.warn("User with ID {} not found", id);
+            throw new IllegalArgumentException("Пользователь с ID " + id + " не найден");
+        }
+        return user;
+    }
+
+    public void deleteUser(Long id) {
+        if (!users.containsKey(id)) {
+            log.warn("Attempt to delete non-existent user with ID: {}", id);
+            throw new IllegalArgumentException("Пользователь с ID " + id + " не найден");
+        }
+        users.remove(id);
+        log.info("User with ID {} deleted", id);
+    }
 
     public void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {

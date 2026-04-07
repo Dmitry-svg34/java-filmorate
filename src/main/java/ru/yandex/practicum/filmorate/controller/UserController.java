@@ -5,8 +5,8 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -14,8 +14,7 @@ import java.util.List;
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
-    private final List<User> users = new ArrayList<>();
-    private int nextId = 1;
+    private long nextId = 1L; // Исправлено: Long вместо int
 
     @Autowired
     public UserController(UserService userService) {
@@ -23,30 +22,54 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         userService.validateUser(user);
-        user.setId(nextId++);
-        users.add(user);
+        user.setId(nextId++); // Теперь корректно: long → Long
+        User createdUser = userService.createUser(user); // Используем сервис
         log.info("User created: {}", user.getLogin());
-        return user;
+        return ResponseEntity.ok(createdUser);
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
-        userService.validateUser(user);
-        int index = users.indexOf(user);
-        if (index != -1) {
-            users.set(index, user);
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
+        try {
+            userService.validateUser(user);
+            User updatedUser = userService.updateUser(user); // Используем сервис
             log.info("User updated: {}", user.getLogin());
-            return user;
-        } else {
-            throw new IllegalArgumentException("Пользователь не найден");
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            log.error("Error updating user: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
         log.info("Retrieved all users, count: {}", users.size());
-        return users;
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        try {
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (IllegalArgumentException e) {
+            log.warn("User with ID {} not found", id);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            log.info("User with ID {} deleted", id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            log.warn("Attempt to delete non-existent user with ID {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
 }
