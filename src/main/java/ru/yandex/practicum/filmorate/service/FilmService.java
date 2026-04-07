@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Service
 public class FilmService {
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
-    private final LocalDate EARLIEST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private final LocalDate earliestReleaseDate = LocalDate.of(1895, 12, 28);
 
     public void validateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
@@ -21,7 +21,7 @@ public class FilmService {
             log.warn("Validation failed: film description too long");
             throw new ValidationException("Описание фильма не может превышать 200 символов");
         }
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(EARLIEST_RELEASE_DATE)) {
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(earliestReleaseDate)) {
             log.warn("Validation failed: film release date too early");
             throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
         }
