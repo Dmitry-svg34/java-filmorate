@@ -22,18 +22,16 @@ class ValidationExceptionIntegrationTest {
     @Test
     void testValidationException_MissingNameField() throws Exception {
         // Given: некорректные данные пользователя (отсутствует поле name)
-        String invalidUserJson = """
-            {
-                "email": "invalid-email",
-                "login": "test"
-            }
-            """;
+        String invalidUserJson = "{\n" +
+                "  \"email\": \"invalid-email\",\n" +
+                "  \"login\": \"test\"\n" +
+                "}";
 
         // When: пытаемся создать пользователя с неполными данными
+        // Then: проверяем ответ валидации
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidUserJson))
-                // Then: проверяем ответ валидации
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation Error"))
                 .andExpect(jsonPath("$.message").value(containsString("name")))
@@ -47,20 +45,18 @@ class ValidationExceptionIntegrationTest {
     @Test
     void testValidationException_InvalidEmailFormat() throws Exception {
         // Given: некорректный email (не соответствует формату)
-        String invalidUserJson = """
-            {
-                "email": "not-an-email",
-                "login": "testuser",
-                "name": "Test User",
-                "birthday": "2000-01-01"
-            }
-            """;
+        String invalidUserJson = "{\n" +
+                "  \"email\": \"not-an-email\",\n" +
+                "  \"login\": \"testuser\",\n" +
+                "  \"name\": \"Test User\",\n" +
+                "  \"birthday\": \"2000-01-01\"\n" +
+                "}";
 
         // When: пытаемся создать пользователя с некорректным email
+        // Then: проверяем обработку ошибки формата email
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidUserJson))
-                // Then: проверяем обработку ошибки формата email
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation Error"))
                 .andExpect(jsonPath("$.message").value(containsString("email")))
