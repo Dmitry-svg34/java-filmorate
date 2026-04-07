@@ -24,7 +24,6 @@ class GlobalExceptionHandlerTest {
         // When: выполняем запрос к несуществующему пользователю
         mockMvc.perform(get("/users/9999")
                         .contentType(MediaType.APPLICATION_JSON))
-                // Then: проверяем ответ
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("User not found"))
@@ -50,7 +49,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidUserJson))
-                // Then: проверяем ответ валидации
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation Error"))
                 .andExpect(jsonPath("$.message").value(containsString("Name must not be blank")))
@@ -66,7 +64,6 @@ class GlobalExceptionHandlerTest {
         // When: запрашиваем несуществующий фильм
         mockMvc.perform(get("/films/9999")
                         .contentType(MediaType.APPLICATION_JSON))
-                // Then: проверяем ответ
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("Film not found"))
@@ -81,7 +78,6 @@ class GlobalExceptionHandlerTest {
         // When: передаём строку вместо числа в параметре ID
         mockMvc.perform(get("/users/abc")
                         .contentType(MediaType.APPLICATION_JSON))
-                // Then: ожидаем ошибку типа аргумента
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value(containsString("Failed to convert value of type 'java.lang.String'")))
@@ -96,7 +92,6 @@ class GlobalExceptionHandlerTest {
         // When: вызываем endpoint, который выбрасывает исключение
         mockMvc.perform(get("/api/internal-error")
                         .contentType(MediaType.APPLICATION_JSON))
-                // Then: проверяем общий обработчик ошибок
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.error").value("Internal Server Error"))
                 .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
@@ -122,7 +117,6 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidFilmJson))
-                // Then: проверяем обработку нарушения ограничений
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation Error"))
                 .andExpect(jsonPath("$.message").value(containsString("Release date must be in the past")))
