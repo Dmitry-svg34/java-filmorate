@@ -6,15 +6,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/users")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
-    private long nextId = 1L; // Исправлено: Long вместо int
+    private long nextId = 1L;
 
     @Autowired
     public UserController(UserService userService) {
@@ -24,8 +25,8 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         userService.validateUser(user);
-        user.setId(nextId++); // Теперь корректно: long → Long
-        User createdUser = userService.createUser(user); // Используем сервис
+        user.setId(nextId++);
+        User createdUser = userService.createUser(user);
         log.info("User created: {}", user.getLogin());
         return ResponseEntity.ok(createdUser);
     }
@@ -34,7 +35,7 @@ public class UserController {
     public ResponseEntity<User> updateUser(@RequestBody User user) {
         try {
             userService.validateUser(user);
-            User updatedUser = userService.updateUser(user); // Используем сервис
+            User updatedUser = userService.updateUser(user);
             log.info("User updated: {}", user.getLogin());
             return ResponseEntity.ok(updatedUser);
         } catch (IllegalArgumentException e) {

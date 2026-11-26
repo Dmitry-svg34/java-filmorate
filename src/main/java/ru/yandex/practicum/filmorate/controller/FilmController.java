@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -14,8 +13,6 @@ import java.util.List;
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final FilmService filmService;
-    private final List<Film> films = new ArrayList<>();
-    private Long nextId = 1L;
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -24,28 +21,21 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        filmService.validateFilm(film);
-        film.setId(nextId++);
-        films.add(film);
-        log.info("Film added: {}", film.getName());
-        return film;
+        Film added = filmService.addFilm(film);
+        log.info("Film added: id={}, name={}", added.getId(), added.getName());
+        return added;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        filmService.validateFilm(film);
-        int index = films.indexOf(film);
-        if (index != -1) {
-            films.set(index, film);
-            log.info("Film updated: {}", film.getName());
-            return film;
-        } else {
-            throw new IllegalArgumentException("Фильм не найден");
-        }
+        Film updated = filmService.updateFilm(film);
+        log.info("Film updated: id={}", updated.getId());
+        return updated;
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
+        List<Film> films = filmService.getAllFilms();
         log.info("Retrieved all films, count: {}", films.size());
         return films;
     }
