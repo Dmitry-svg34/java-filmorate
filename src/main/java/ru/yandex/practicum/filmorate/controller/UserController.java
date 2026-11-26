@@ -1,21 +1,28 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
-    private long nextId = 1L;
 
     @Autowired
     public UserController(UserService userService) {
@@ -23,54 +30,35 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        userService.validateUser(user);
-        user.setId(nextId++);
+    public User createUser(@Valid @RequestBody User user) {
         User createdUser = userService.createUser(user);
-        log.info("User created: {}", user.getLogin());
-        return ResponseEntity.ok(createdUser);
+        log.info("User created: {}", createdUser.getLogin());
+        return createdUser;
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        try {
-            userService.validateUser(user);
-            User updatedUser = userService.updateUser(user);
-            log.info("User updated: {}", user.getLogin());
-            return ResponseEntity.ok(updatedUser);
-        } catch (IllegalArgumentException e) {
-            log.error("Error updating user: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
+    public User updateUser(@Valid @RequestBody User user) {
+        User updatedUser = userService.updateUser(user);
+        log.info("User updated: {}", updatedUser.getLogin());
+        return updatedUser;
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public List<User> getAllUsers() {
         List<User> users = userService.getAllUsers();
         log.info("Retrieved all users, count: {}", users.size());
-        return ResponseEntity.ok(users);
+        return users;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        try {
-            User user = userService.getUserById(id);
-            return ResponseEntity.ok(user);
-        } catch (IllegalArgumentException e) {
-            log.warn("User with ID {} not found", id);
-            return ResponseEntity.notFound().build();
-        }
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        try {
-            userService.deleteUser(id);
-            log.info("User with ID {} deleted", id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            log.warn("Attempt to delete non-existent user with ID {}", id);
-            return ResponseEntity.notFound().build();
-        }
+        userService.deleteUser(id);
+        log.info("User with ID {} deleted", id);
+        return ResponseEntity.noContent().build();
     }
 }

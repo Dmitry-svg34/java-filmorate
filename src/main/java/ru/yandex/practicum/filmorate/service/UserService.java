@@ -1,12 +1,16 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -27,7 +31,7 @@ public class UserService {
         Long userId = user.getId();
         if (userId == null || !users.containsKey(userId)) {
             log.warn("Attempt to update non-existent user with ID: {}", userId);
-            throw new IllegalArgumentException("Пользователь с ID " + userId + " не найден");
+            throw new NotFoundException("User not found");
         }
         validateUser(user);
         users.put(userId, user);
@@ -45,7 +49,7 @@ public class UserService {
         User user = users.get(id);
         if (user == null) {
             log.warn("User with ID {} not found", id);
-            throw new IllegalArgumentException("Пользователь с ID " + id + " не найден");
+            throw new NotFoundException("User not found");
         }
         return user;
     }
@@ -53,7 +57,7 @@ public class UserService {
     public void deleteUser(Long id) {
         if (!users.containsKey(id)) {
             log.warn("Attempt to delete non-existent user with ID: {}", id);
-            throw new IllegalArgumentException("Пользователь с ID " + id + " не найден");
+            throw new NotFoundException("User not found");
         }
         users.remove(id);
         log.info("User with ID {} deleted", id);

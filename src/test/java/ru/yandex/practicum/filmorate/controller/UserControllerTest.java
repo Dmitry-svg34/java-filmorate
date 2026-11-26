@@ -97,6 +97,13 @@ class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+
+
+        mockMvc.perform(get("/users/{id}", createdUser.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Temp User"));
+    }
+
     private User createTestUser() throws Exception {
         User user = new User();
         user.setEmail("temp@example.com");
