@@ -3,11 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmServiceTest {
-    private final FilmService filmService = new FilmService();
+    InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
+    FilmService filmService = new FilmService(filmStorage);
 
     @Test
     void testValidFilm() {
