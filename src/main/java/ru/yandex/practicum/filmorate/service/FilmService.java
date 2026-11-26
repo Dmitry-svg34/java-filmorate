@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import jakarta.validation.constraints.Positive;
 import ru.yandex.practicum.filmorate.model.Film;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,5 +69,15 @@ public class FilmService {
             throw new NotFoundException("Фильм с id=" + id + " не найден");
         }
         return film;
+    }
+
+    public List<Film> getPopularFilms(@Positive int count) {
+        return List.of();
+    }
+
+    public void addLike(@Positive Long id, @Positive Long userId) {
+    }
+
+    public void removeLike(@Positive Long id, @Positive Long userId) {
     }
 }
