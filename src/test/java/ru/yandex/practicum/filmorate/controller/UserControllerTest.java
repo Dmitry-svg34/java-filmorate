@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -28,7 +29,7 @@ class UserControllerTest {
         user.setEmail("user@example.com");
         user.setLogin("testlogin");
         user.setName("Test User");
-        user.setBirthday(LocalDate.of(1990, 1, 1)); // Исправлено: LocalDate вместо строки
+        user.setBirthday(LocalDate.of(1990, 1, 1));
 
         mockMvc.perform(post("/users")
                         .contentType("application/json")
@@ -40,7 +41,6 @@ class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        // Создаём тестового пользователя
         User createdUser = createTestUser();
 
         mockMvc.perform(get("/users/{id}", createdUser.getId()))
@@ -70,7 +70,7 @@ class UserControllerTest {
 
     @Test
     void testGetAllUsers() throws Exception {
-        createTestUser(); // Создаём хотя бы одного пользователя
+        createTestUser();
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
@@ -80,10 +80,10 @@ class UserControllerTest {
     @Test
     void testCreateUserWithInvalidEmail() throws Exception {
         User user = new User();
-        user.setEmail("invalid-email"); // Некорректный email
+        user.setEmail("invalid-email");
         user.setLogin("testlogin");
         user.setName("Test User");
-        user.setBirthday(LocalDate.of(1990, 1, 1)); // Исправлено: LocalDate
+        user.setBirthday(LocalDate.of(1990, 1, 1));
 
         mockMvc.perform(post("/users")
                         .contentType("application/json")
@@ -97,19 +97,12 @@ class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-
-
-        mockMvc.perform(get("/users/{id}", createdUser.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Temp User"));
-    }
-
     private User createTestUser() throws Exception {
         User user = new User();
         user.setEmail("temp@example.com");
         user.setLogin("templogin");
         user.setName("Temp User");
-        user.setBirthday(LocalDate.of(1995, 5, 5)); // Исправлено: LocalDate вместо строки
+        user.setBirthday(LocalDate.of(1995, 5, 5));
 
         String response = mockMvc.perform(post("/users")
                         .contentType("application/json")
